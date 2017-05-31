@@ -121,6 +121,8 @@ class OdomHandle
         
         odomtheta=0;
         count = 0;
+        
+        ww=1;
       
     }
     //NEU -> NWU
@@ -351,9 +353,9 @@ int main(int argc, char** argv)
                 if(dist(i,j) < stopdist)//publish stop msg (too close)
                 {
                     std_msgs::Int32 stopmsg;
-                    cout<<"distance too close, trigering hovering"<<endl;
-                    for(int k=0;k<robotnum;k++)
-                        odom_list[k]->stop_pub.publish(stopmsg);
+                    //cout<<"distance too close, trigering hovering"<<endl;
+                    //for(int k=0;k<robotnum;k++)
+                       // odom_list[k]->stop_pub.publish(stopmsg);
                 }
            }
            //publish status msg 
@@ -403,6 +405,7 @@ int main(int argc, char** argv)
           
           stringstream ss;
           ss<<"uav"<<i<<"/odom";
+          
           br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", ss.str().c_str()));
           //cout<<"sent"<<endl;
       }
