@@ -1,4 +1,6 @@
+
 <launch>
+  <!--param name='use_sim_time' value='true' /-->
   <node name="bebop_manager" pkg="quadrotor_code" type="bebop_manager" output="screen">
     <param name='robotnum' value='3'/>
     <param name='uav0_x' value='0'/>  <param name='uav0_y' value='0'/>

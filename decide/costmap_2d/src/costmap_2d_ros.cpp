@@ -531,11 +531,15 @@ bool Costmap2DROS::getRobotPose(tf::Stamped<tf::Pose>& global_pose) const
     return false;
   }
   // check global_pose timeout
-  if (current_time.toSec() - global_pose.stamp_.toSec() > transform_tolerance_)
+  //if (current_time.toSec() - global_pose.stamp_.toSec() > transform_tolerance_)
+  if (current_time.toSec() - global_pose.stamp_.toSec() > 5)
   {
-    ROS_WARN_THROTTLE(1.0,
+   // ROS_WARN_THROTTLE(1.0,
+   //                   "Costmap2DROS transform timeout. Current time: %.4f, global_pose stamp: %.4f, tolerance: %.4f",
+   //                   current_time.toSec(), global_pose.stamp_.toSec(), transform_tolerance_);
+     ROS_WARN_THROTTLE(1.0,
                       "Costmap2DROS transform timeout. Current time: %.4f, global_pose stamp: %.4f, tolerance: %.4f",
-                      current_time.toSec(), global_pose.stamp_.toSec(), transform_tolerance_);
+                      current_time.toSec(), global_pose.stamp_.toSec(), 5);
     return false;
   }
 

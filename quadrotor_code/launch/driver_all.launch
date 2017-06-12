@@ -26,12 +26,12 @@
     
         <node machine="pi0" name="bebop_vel_ctrl" type="bebop_vel_ctrl_node" pkg="bebop_vel_ctrl" output="screen" >
             <remap from="setpoint/cmd_vel" to="velctrl/input" />
-    	    <remap from="cmd_vel" to="barrier_input_cmd_vel" />
+    	    <!--remap from="cmd_vel" to="barrier_input_cmd_vel" /-->
     	    <remap from="debug" to="vel_ctrl/debug" />
     	    <rosparam command="load" file="$(find bebop_vel_ctrl)/config/bebop_vel_ctrl.yaml" />
         </node>
    
-        <node machine="pi0" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
+        <!--node machine="pi0" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
             <param name="robot_name" type="string" value="uav0"/>
             <param name="x_limit" type="double" value="10.0"/>
             <param name="y_limit" type="double" value="10.0"/>
@@ -40,7 +40,7 @@
             <param name="x_vel_limit" type="double" value="0.8"/>
             <param name="y_vel_limit" type="double" value="0.8"/>
             <param name="z_vel_limit" type="double" value="0.8"/>
-        </node>
+        </node-->
     </group>
     
     <group ns="uav1">
@@ -58,12 +58,12 @@
     
         <node machine="pi1" name="bebop_vel_ctrl" type="bebop_vel_ctrl_node" pkg="bebop_vel_ctrl" output="screen" >
             <remap from="setpoint/cmd_vel" to="velctrl/input" />
-    	    <remap from="cmd_vel" to="barrier_input_cmd_vel" />
+    	    <!--remap from="cmd_vel" to="barrier_input_cmd_vel" /-->
     	    <remap from="debug" to="vel_ctrl/debug" />
     	    <rosparam command="load" file="$(find bebop_vel_ctrl)/config/bebop_vel_ctrl.yaml" />
         </node>
    
-        <node machine="pi1" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
+        <!--node machine="pi1" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
             <param name="robot_name" type="string" value="uav1"/>
             <param name="x_limit" type="double" value="10.0"/>
             <param name="y_limit" type="double" value="10.0"/>
@@ -72,7 +72,7 @@
             <param name="x_vel_limit" type="double" value="0.8"/>
             <param name="y_vel_limit" type="double" value="0.8"/>
             <param name="z_vel_limit" type="double" value="0.8"/>
-        </node>
+        </node-->
     </group>
     
     <group ns="uav2">
@@ -90,12 +90,12 @@
     
         <node machine="pi2" name="bebop_vel_ctrl" type="bebop_vel_ctrl_node" pkg="bebop_vel_ctrl" output="screen" >
             <remap from="setpoint/cmd_vel" to="velctrl/input" />
-    	    <remap from="cmd_vel" to="barrier_input_cmd_vel" />
+    	    <!--remap from="cmd_vel" to="barrier_input_cmd_vel" /-->
     	    <remap from="debug" to="vel_ctrl/debug" />
     	    <rosparam command="load" file="$(find bebop_vel_ctrl)/config/bebop_vel_ctrl.yaml" />
         </node>
    
-        <node machine="pi2" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
+        <!--node machine="pi2" pkg="flight_barrier" type="flight_barrier_node" name="flight_barrier_node" output="screen">
             <param name="robot_name" type="string" value="uav2"/>
             <param name="x_limit" type="double" value="10.0"/>
             <param name="y_limit" type="double" value="10.0"/>
@@ -104,7 +104,7 @@
             <param name="x_vel_limit" type="double" value="0.8"/>
             <param name="y_vel_limit" type="double" value="0.8"/>
             <param name="z_vel_limit" type="double" value="0.8"/>
-        </node>
+        </node-->
     </group>
 
 </launch>

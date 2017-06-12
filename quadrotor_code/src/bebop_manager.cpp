@@ -400,7 +400,8 @@ int main(int argc, char** argv)
           tf::Transform transform;
           transform.setOrigin( tf::Vector3(odom_list[i]->odomx,odom_list[i]->odomy , odom_list[i]->odomz) );
           tf::Quaternion q;
-          q.setRPY(0, 0, odom_list[i]->odomtheta);
+          //q.setRPY(0, 0, odom_list[i]->odomtheta);
+          q.setRPY(0, 0, 0);
           transform.setRotation(q);
           
           stringstream ss;

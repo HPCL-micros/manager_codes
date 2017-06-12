@@ -84,7 +84,7 @@ def getKey():
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-speed = .2
+speed = .5
 turn = 1
 
 def vels(speed,turn):
@@ -130,6 +130,7 @@ if __name__=="__main__":
     target_turn = 0
     control_speed = 0
     control_turn = 0
+    last_zero = False
     try:
         print msg
         print vels(speed,turn)
@@ -200,6 +201,13 @@ if __name__=="__main__":
             twist = Twist()
             twist.linear.x = control_speed; twist.linear.y = 0; twist.linear.z = 0
             twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = control_turn
+            if control_speed == 0 and control_turn == 0:
+                if last_zero == True:
+                    continue
+                else:
+                    last_zero = True
+            else:
+                last_zero = False
             pub.publish(twist)
             pub1.publish(twist)
             #print("loop: {0}".format(count))
