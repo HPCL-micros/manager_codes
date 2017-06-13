@@ -50,7 +50,8 @@ space key, k : force stop
 anything else : stop smoothly
 
 CTRL-C to quit
-v,b,n:takeoff,land,reset
+v,b:takeoff,land,
+reset will usually damage the UAVs : n + m(in 1s after n)
 """
 
 moveBindings = {
@@ -76,6 +77,17 @@ speedBindings={
 def getKey():
     tty.setraw(sys.stdin.fileno())
     rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+def getKeySlow():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 1.1)
     if rlist:
         key = sys.stdin.read(1)
     else:
@@ -119,6 +131,26 @@ if __name__=="__main__":
     emergencypub4 = rospy.Publisher('/uav4/reset',Empty,queue_size=5)
     pub4 = rospy.Publisher('/uav4/cmd_vel', Twist, queue_size=5)
     
+    takeoffpub5 = rospy.Publisher('/uav5/takeoff',Empty,queue_size=5)
+    landpub5 = rospy.Publisher('/uav5/land',Empty,queue_size=5)
+    emergencypub5 = rospy.Publisher('/uav5/reset',Empty,queue_size=5)
+    pub5 = rospy.Publisher('/uav5/cmd_vel', Twist, queue_size=5)
+    
+    takeoffpub6 = rospy.Publisher('/uav6/takeoff',Empty,queue_size=5)
+    landpub6 = rospy.Publisher('/uav6/land',Empty,queue_size=5)
+    emergencypub6 = rospy.Publisher('/uav6/reset',Empty,queue_size=5)
+    pub6 = rospy.Publisher('/uav6/cmd_vel', Twist, queue_size=5)
+    
+    takeoffpub7 = rospy.Publisher('/uav7/takeoff',Empty,queue_size=5)
+    landpub7 = rospy.Publisher('/uav7/land',Empty,queue_size=5)
+    emergencypub7 = rospy.Publisher('/uav7/reset',Empty,queue_size=5)
+    pub7 = rospy.Publisher('/uav7/cmd_vel', Twist, queue_size=5)
+    
+    takeoffpub8 = rospy.Publisher('/uav8/takeoff',Empty,queue_size=5)
+    landpub8 = rospy.Publisher('/uav8/land',Empty,queue_size=5)
+    emergencypub8 = rospy.Publisher('/uav8/reset',Empty,queue_size=5)
+    pub8 = rospy.Publisher('/uav8/cmd_vel', Twist, queue_size=5)
+    
     stoppub = rospy.Publisher('/stop', Int32, queue_size=5)
     stopmsg = Int32()
     x = 0
@@ -142,17 +174,33 @@ if __name__=="__main__":
                 takeoffpub2.publish(eptmsg)
                 takeoffpub3.publish(eptmsg)
                 takeoffpub4.publish(eptmsg)
+                takeoffpub5.publish(eptmsg)
+                takeoffpub6.publish(eptmsg)
+                takeoffpub7.publish(eptmsg)
+                takeoffpub8.publish(eptmsg)
             elif key == 'b':
                 landpub.publish(eptmsg)
                 landpub1.publish(eptmsg)
                 landpub2.publish(eptmsg)
                 landpub3.publish(eptmsg)
                 landpub4.publish(eptmsg)
+                landpub5.publish(eptmsg)
+                landpub6.publish(eptmsg)
+                landpub7.publish(eptmsg)
+                landpub8.publish(eptmsg)
                 
             elif key == 'n':
-                emergencypub.publish(eptmsg);
-                emergencypub1.publish(eptmsg);
-                emergencypub2.publish(eptmsg);
+                key2 = getKeySlow()
+                if key2 == 'm':
+                    emergencypub.publish(eptmsg);
+                    emergencypub1.publish(eptmsg);
+                    emergencypub2.publish(eptmsg);
+                    emergencypub3.publish(eptmsg);
+                    emergencypub4.publish(eptmsg);
+                    emergencypub5.publish(eptmsg);
+                    emergencypub6.publish(eptmsg);
+                    emergencypub7.publish(eptmsg);
+                    emergencypub8.publish(eptmsg);
             elif key == 'g':
                 stoppub.publish(stopmsg)
             if key in moveBindings.keys():
@@ -210,6 +258,13 @@ if __name__=="__main__":
                 last_zero = False
             pub.publish(twist)
             pub1.publish(twist)
+            pub2.publish(twist)
+            pub3.publish(twist)
+            pub4.publish(twist)
+            pub5.publish(twist)
+            pub6.publish(twist)
+            pub7.publish(twist)
+            pub8.publish(twist)
             #print("loop: {0}".format(count))
             #print("target: vx: {0}, wz: {1}".format(target_speed, target_turn))
             #print("publihsed: vx: {0}, wz: {1}".format(twist.linear.x, twist.angular.z))

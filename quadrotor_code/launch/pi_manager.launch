@@ -1,9 +1,11 @@
 <launch>
   <node name="bebop_manager" pkg="quadrotor_code" type="bebop_manager" output="screen">
-    <param name='robotnum' value='1'/>
+    <param name='robotnum' value='5'/>
     <param name='uav0_x' value='0'/>  <param name='uav0_y' value='0'/>
     <param name='uav1_x' value='0'/>  <param name='uav1_y' value='-3'/>
     <param name='uav2_x' value='0'/>  <param name='uav2_y' value='-6'/>
+    <param name='uav3_x' value='-3'/>  <param name='uav3_y' value='0'/>
+    <param name='uav4_x' value='-3'/>  <param name='uav4_y' value='-3'/>
     
   </node>
   
