@@ -162,6 +162,12 @@ class OdomHandle
         //_position.first=_px;_position.second=_py;
         //_velocity.first=_vx;_velocity.second=_vy;
         _theta = tf::getYaw(msg->pose.pose.orientation);
+        
+        tf::Quaternion q1(msg->pose.pose.orientation.x,msg->pose.pose.orientation.y,msg->pose.pose.orientation.z,msg->pose.pose.orientation.w);
+        
+        tf::Matrix3x3 m(q1);
+        double ro,pi,ya;
+        m.getRPY(ro,pi,ya);
         qx= msg->pose.pose.orientation.x;
         qy = msg->pose.pose.orientation.y;
         qz = msg->pose.pose.orientation.z;

@@ -10,8 +10,8 @@ Panels:
         - /Odometry2
         - /Odometry3
         - /Odometry4
-        - /Odometry5
-        - /PoseArray1
+        - /Odometry8
+        - /Odometry9
       Splitter Ratio: 0.5
     Tree Height: 435
   - Class: rviz/Selection
@@ -142,6 +142,18 @@ Visualization Manager:
           Value: true
         uav2/odom:
           Value: true
+        uav3/odom:
+          Value: true
+        uav4/odom:
+          Value: true
+        uav5/odom:
+          Value: true
+        uav6/odom:
+          Value: true
+        uav7/odom:
+          Value: true
+        uav8/odom:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -155,7 +167,59 @@ Visualization Manager:
             {}
           uav2/odom:
             {}
+          uav3/odom:
+            {}
+          uav4/odom:
+            {}
+          uav5/odom:
+            {}
+          uav6/odom:
+            {}
+          uav7/odom:
+            {}
+          uav8/odom:
+            {}
       Update Interval: 0
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 255; 255; 0
+      Enabled: true
+      Keep: 100
+      Length: 1
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /uav5/fix_odom
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 85; 0; 0
+      Enabled: true
+      Keep: 100
+      Length: 1
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /uav6/fix_odom
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 0; 170; 127
+      Enabled: true
+      Keep: 100
+      Length: 1
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /uav7/fix_odom
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Color: 0; 85; 127
+      Enabled: true
+      Keep: 100
+      Length: 1
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Topic: /uav8/fix_odom
       Value: true
   Enabled: true
   Global Options:
@@ -181,7 +245,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.87968445
+      Distance: 30.7291145
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
