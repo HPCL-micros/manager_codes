@@ -14,4 +14,12 @@
   </node>
   
    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find quadrotor_code)/rviz/bebop_swarm_navigation.rviz"/>
+   
+    <arg name="map_file"       default="$(find turtlebot_stage)/maps/maze.yaml"/> <!-- robopark_plan -->
+  <!--arg name="world_file"     default=" $(env TURTLEBOT_STAGE_WORLD_FILE)"/-->
+  <arg name="world_file"     default="$(find turtlebot_stage)/maps/stage/maze.world"/>
+  <!--  ****** Maps *****  -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
+    <param name="frame_id" value="/map"/>
+  </node>
 </launch>
