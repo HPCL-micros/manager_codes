@@ -123,6 +123,7 @@ class OdomHandle
         count = 0;
         
         ww=1;
+        xx=0;yy=0;zz=0;ww=1;
       
     }
     //NEU -> NWU
