@@ -15,8 +15,14 @@ find_package(catkin REQUIRED COMPONENTS
   geodesy
   bebop_msgs
   nav_msgs
+  action_softbus
 )
-
+find_package(Boost REQUIRED COMPONENTS
+  system
+  thread
+  regex
+  serialization
+)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -118,6 +124,18 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+include_directories(
+    ${catkin_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+)
+
+link_directories(
+  ${Boost_THREAD_LIBRARY}
+  ${Boost_REGEX_LIBRARY}
+  ${Boost_SERIALIZATION_LIBRARY}
+  ${catkin_LIBRARY_DIRS}
+)
 ###########
 ## Build ##
 ###########
@@ -127,6 +145,7 @@ add_executable(hector_reset src/hector_reset.cpp)
 add_executable(bebop_manager src/bebop_manager.cpp) 
 add_executable(fly_circle src/fly_circle.cpp)
 add_executable(hector_sim_manager src/hector_sim_manager.cpp)
+add_executable(comm_manager src/comm_manager.cpp) 
 #add_dependencies(gpstest ${micros_flocking_EXPORTED_TARGETS})
 
 add_dependencies(gpstest ${quadrotor_code_EXPORTED_TARGETS})
@@ -137,6 +156,7 @@ add_dependencies(fly_circle ${quadrotor_code_EXPORTED_TARGETS})
 add_dependencies(hector_sim_manager ${quadrotor_code_EXPORTED_TARGETS})
 add_dependencies(bebop_manager decide_softbus_msgs_generate_messages_cpp)
 add_dependencies(hector_sim_manager decide_softbus_msgs_generate_messages_cpp)
+add_dependencies(comm_manager ${quadrotor_code_EXPORTED_TARGETS})
 
 target_link_libraries( gpstest 
    ${catkin_LIBRARIES}
@@ -155,6 +175,13 @@ target_link_libraries( gpstest
  )
  target_link_libraries( hector_sim_manager 
    ${catkin_LIBRARIES}
+ )
+ target_link_libraries( comm_manager 
+   ${Boost_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${Boost_THREAD_LIBRARY}
+  ${Boost_REGEX_LIBRARY}
+  ${Boost_SERIALIZATION_LIBRARY}
  )
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
