@@ -33,6 +33,7 @@
 #include "path_msg.h"
 #include <boost/thread/thread.hpp> 
 #include "UDP_BC.h"
+#include <roslz4/lz4s.h>
 using namespace std;
 #define R 7
 #define sendT 1
@@ -270,10 +271,15 @@ void rcv_thread()
         //loop_rate.sleep();
         //cout<<"000000"<<endl;
         int rcvok=UDP_BC_test.UDP_BC_recv(send_address,msg_type,recv_data);
-        cout<<count++<<endl;
+        //cout<<count++<<endl;
         if(rcvok==-1)
         {
             cout<<"[ERRROR]udp rcv failed"<<endl;
+            continue;
+        }
+        else if (rcvok==-2)
+        {
+            cout<<"[ERRROR]udp rcv bad string"<<endl;
             continue;
         }
         string fullstring=recv_data;//rcv string
@@ -288,7 +294,13 @@ void rcv_thread()
         istringstream iarchiveStream(istring);
         boost::archive::text_iarchive iarchive(iarchiveStream);
         NeighborInfo ni_new;
-        iarchive>>ni_new;
+        try{
+            iarchive>>ni_new;
+        }catch (const exception&e)
+        {
+            cout<<"[WARN]deserialization error"<<endl;
+            continue;
+        }
         int id=ni_new._r_id;
         double px=ni_new._px;
         double py=ni_new._py;
@@ -297,7 +309,7 @@ void rcv_thread()
             
         geometry_msgs::Quaternion q;
         q.x=ni_new._xx;q.y=ni_new._yy;q.z=ni_new._zz;q.w=ni_new._ww;
-        cout<<id<<' '<<px<<' '<<py<<' '<<tf::getYaw(q)<<endl;
+        //cout<<id<<' '<<px<<' '<<py<<' '<<tf::getYaw(q)<<endl;
         //cout<<"11111111111"<<endl;
         if(id>=0)
         {
@@ -437,11 +449,27 @@ void swarmPlanCB(const decide_softbus_msgs::Path::ConstPtr& pre_plan)
   ostringstream archiveStream;
   boost::archive::text_oarchive archive(archiveStream);
   archive<<pmsg;
+  cout<<pmsg.px.size()<<' '<<pmsg.py.size()<<' '<<pmsg.pz.size()<<' '<<pmsg.ox.size()<<' '<<pmsg.oy.size()<<' '<<pmsg.oz.size()<<' '<<pmsg.ow.size()<<endl;
   string pmsg_string="2"+archiveStream.str();
+  string msg_type = "0";
+  UDP_BC_test.UDP_BC_send(msg_type,pmsg_string);
+  
+  istringstream ias(pmsg_string.substr(1));
+  boost::archive::text_iarchive ia(ias);
+  PathMessage ni_new;
+  try{
+      ia>>ni_new;
+  }catch(const exception &e)
+  {
+     cout<<"deserialiation error"<<endl;
+  }
+  cout<<ni_new.px.size()<<' '<<ni_new.py.size()<<' '<<ni_new.pz.size()<<' '<<ni_new.ox.size()<<' '<<ni_new.oy.size()<<' '<<ni_new.oz.size()<<' '<<ni_new.ow.size()<<endl;
+  //cout<<pmsg_string.length()<<endl;
   //sendstring here
+  /*
   std_msgs::String sendmsg;
   sendmsg.data = pmsg_string;
-  path_pub_virtual.publish(sendmsg);
+  path_pub_virtual.publish(sendmsg);*/
   
 }
 
@@ -564,6 +592,7 @@ int main(int argc, char** argv)
       //publish control status,0 for land, 1 for takeoff, 2 for activate
       string sendstring;
       sendstring="0"+status;
+      //cout<<sendstring<<' '<<sendstring.length()<<endl;
       //ActivatePub.publish(sendstring);
       string msg_type = "0";
       int index = 0;
@@ -595,6 +624,13 @@ int main(int argc, char** argv)
           br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", ss.str().c_str()));
           //cout<<"sent"<<endl;
       }
+      tf::Transform transform;
+      transform.setOrigin(tf::Vector3( 0,0 , 0) );
+      tf::Quaternion q;
+      q.setRPY(0, 0, 0);
+      transform.setRotation(q);
+      br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "uav0/odom"));
+      
       count++;
       loop_rate.sleep();
    }

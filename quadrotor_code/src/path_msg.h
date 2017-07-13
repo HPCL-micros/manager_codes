@@ -27,7 +27,7 @@ struct PathMessage{
             ar & px;
             ar & py;
             ar & pz;
-            ar & oz;
+            ar & ox;
             ar & oy;
             ar & oz;
             ar & ow;
@@ -36,6 +36,7 @@ struct PathMessage{
         }
             
         PathMessage(){}
+        PathMessage(std::vector<float> vpx,std::vector<float> vpy, std::vector<float> vpz, std::vector<float> vox,std::vector<float>voy,std::vector<float> voz,std::vector<float> vow,float vtime,float vf):px(vpx),py(vpy),pz(vpz),ox(vox),oy(voy),oz(voz),ow(vow),arrival_time(vtime),formation(vf){}
         
     };
     

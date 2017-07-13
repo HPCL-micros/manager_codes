@@ -13,7 +13,7 @@
 using namespace std;
 //#define DEBUG_FLAG 0
 
-#define MAX_UDP_SIZE 1024
+#define MAX_UDP_SIZE 10000
 
 class UDP_BC
 {
@@ -111,7 +111,7 @@ int UDP_BC::UDP_BC_send(string msg_type, string payload_data_send)
     char* data;
     data = (char*)malloc((str_length+1)*sizeof(char));
     data_stream.copy(data,str_length,0); 
-
+    data[str_length]='\0';
     int ret=sendto(sock, data, strlen(data), 0, (sockaddr*)&addrto, nlen);
 
     if(ret<0)  
@@ -125,6 +125,7 @@ int UDP_BC::UDP_BC_send(string msg_type, string payload_data_send)
 #endif    
     }  
     packet_index_send += 1;
+    delete data;
 }
 
 

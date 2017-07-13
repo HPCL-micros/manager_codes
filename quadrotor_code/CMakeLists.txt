@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   bebop_msgs
   nav_msgs
   action_softbus
+  roslz4
 )
 find_package(Boost REQUIRED COMPONENTS
   system
