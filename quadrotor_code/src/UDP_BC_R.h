@@ -30,7 +30,19 @@
 * 1. Pure 255.255.255.255 based flooding
 */
 
+/*
+forget "\0" from stream to char: 1.0
+malloc without freespace: 1.0 
+cannot handle space in payloadstream: 1.0
+header file reinclude: 0.5
+forget return: 0.5
+*/
+
+#ifndef UDP_BC_H_
+#define UDP_BC_H_
+
 #include <iostream>  
+#include <fstream>
 #include <stdio.h>  
 #include <stdlib.h>
 #include <sys/socket.h>  
@@ -41,7 +53,7 @@
 #include <arpa/inet.h>  
 #include <string.h> 
 #include <sstream> 
-#include <time.h>
+#include <sys/time.h>
 #include "IP_ToolBox.h"
 
 using namespace std;
@@ -58,7 +70,7 @@ using namespace std;
 //* NET_FULL_RECORD:
 //* IF Defined: Record the following information for analyzing Delay & PER
 //* Source_node_IP Send_packet_index Send_Timestamp Recv_Timestamp Msg_Type
-//#define NET_FULL_RECORD 0
+#define NET_FULL_RECORD 0
 
 #define MAX_UDP_SIZE 10000//Maximum UDP_Size is 65536 - Overhead, So MAX_UDP_SIZE<60000 is Safe
 
@@ -84,6 +96,11 @@ class UDP_BC
         int nlen;
         int packet_index_send;
         int packet_index_recv;
+
+#ifdef NET_FULL_RECORD
+        string log_filename_str;
+#endif
+        
 };
 
 UDP_BC::UDP_BC(int BC_type_init,string HOST_IP_init,int PORT_init)
@@ -108,12 +125,24 @@ UDP_BC::UDP_BC(int BC_type_init,string HOST_IP_init,int PORT_init)
         IP_addrto_ss << ".255";
         IP_addrto_ss >> IP_addrto;
         //cout<<IP_addrto<<endl;
-    }
-        
+    }     
     else 
         IP_addrto = "255.255.255.255";
 
     const char* IP_addrto_char = IP_addrto.data();
+
+#ifdef NET_FULL_RECORD
+    ofstream outfile;
+    stringstream file_name_ss;
+    string filename_str;
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    int time_file_record = tv.tv_sec;//sec
+
+    file_name_ss << "net_full_record_at_" << HOST_IP_init << "_"<< PORT_init<<"_"<<time_file_record<<".log";
+    file_name_ss >> log_filename_str;
+#endif
 
     //
     setvbuf(stdout, NULL, _IONBF, 0);   
@@ -161,15 +190,15 @@ int UDP_BC::bind_socket()
 
 int UDP_BC::UDP_BC_send(string msg_type, string payload_data_send)
 {
-    double time = 0.0;//need a timer in c++ 
-    
     stringstream ss;
     ss << packet_index_send << " ";
     ss << parity << " ";//add parity bits for middle-ware or application-layer packet parser
 
 #ifdef NET_FULL_RECORD
-    time = double(clock());
-    ss << time << " " << msg_type << " ";//add network performance record probe
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    long long time_send = tv.tv_sec*1000 + tv.tv_usec/1000;//ms
+    ss << time_send << " " << msg_type << " ";//add network performance record probe
 #endif
     ss << payload_data_send; //add the payload data to the end of the string
 
@@ -226,7 +255,9 @@ int UDP_BC::UDP_BC_recv(string &send_addr, int &msg_type, string &payload_data_r
         int ret=recvfrom(sock, recv_data, MAX_UDP_SIZE, 0, (struct sockaddr*)&from,(socklen_t*)&nlen);  
         if(ret<=0)  
         {  
+#ifdef DEBUG_FLAG 
             cout<<"read error...."<<sock<<endl;
+#endif
             return -1;  
         }  
         else  
@@ -254,18 +285,36 @@ int UDP_BC::UDP_BC_recv(string &send_addr, int &msg_type, string &payload_data_r
 
 #ifdef NET_FULL_RECORD                        
      
-            double time_record;
+            long long send_time_record;
 
             recv_data_full >> packet_index_send_record;
-            recv_data_full >> time_record;
-            recv_data_full >> msg_type;
-            recv_data_full >> parity_record;    
-            recv_data_full >> payload_data_recv;//output payload_data_recv anyway, not knowing its correct or not
-
+            recv_data_full >> parity_record; 
+            recv_data_full >> send_time_record;
+            recv_data_full >> msg_type;  
+            //recv_data_full >> payload_data_recv_temp;//output payload_data_recv anyway, not knowing its correct or not
+            getline(recv_data_full, payload_data_recv_temp);
+            payload_data_recv_temp = payload_data_recv_temp.substr(1, payload_data_recv_temp.length());
+            
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            long long receive_time_record = tv.tv_sec*1000 + tv.tv_usec/1000;
+           // cout<<"rcv_string="<<recv_data_full.str()<<endl;
+/*
             cout<<"From Node: "<<inet_ntoa(from.sin_addr)<<";send_packet_index = ";
-            cout<<packet_index_send_record<<";send_time = "<<time_record;
-            cout<<";recv_time = "<<double(clock());
-            cout<<";msg_type = "<<msg_type<<";success_flag = "<<success_flag<<endl;
+            cout<<packet_index_send_record<<";send_time = "<<send_time_record;
+           // cout<<";recv_time = "<<double(clock());*/
+            //cout<<"parity_record = "<<parity_record<<";payload = "<<payload_data_recv<<endl;
+
+            //write to log file    
+            const char* net_full_record_file = log_filename_str.data();
+            ofstream outfile;
+            outfile.open(net_full_record_file, std::ofstream::out | std::ofstream::app);  
+            //cout<<"File_name = "<<net_full_record_file<<endl;
+            outfile<<inet_ntoa(from.sin_addr)<<" ";
+            outfile<<packet_index_send_record<<" "<<send_time_record<<" "<<receive_time_record<<" ";
+            outfile<<msg_type<<endl;
+            outfile.close();
+
 #else
             //cout<<recv_data_full<<endl;
             recv_data_full >> packet_index_send_record;
@@ -311,10 +360,10 @@ int UDP_BC::UDP_BC_recv(string &send_addr, int &msg_type, string &payload_data_r
                 cout<<parity_record<<endl;
                 cout<<"packet error"<<endl;
 #endif  
-                 cout<<parity_record<<endl;
-                cout<<"packet error"<<endl;
                 return -2;
             }
         }  
     }  
 }
+
+#endif

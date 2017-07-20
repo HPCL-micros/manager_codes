@@ -1,4 +1,7 @@
 #define TF_EULER_DEFAULT_ZYX
+//#define commold 0
+//#define commnew 0
+#define commrecord 0
 
 #include "ros/ros.h"
 #include "tf/tf.h"
@@ -29,10 +32,18 @@
 #include <ctime>
 #include <fstream>
 #include <math.h>
-#include "action_softbus/neighbor_msg.h"
+#include "neighbor_msg.h"
 #include "path_msg.h"
 #include <boost/thread/thread.hpp> 
-#include "UDP_BC.h"
+#ifdef commold
+    #include "UDP_BC_old.h"
+#endif 
+#ifdef commnew
+    #include "UDP_BC.h"
+#endif
+#ifdef commrecord
+    #include "UDP_BC_R.h"
+#endif
 #include <roslz4/lz4s.h>
 using namespace std;
 #define R 7
@@ -51,7 +62,8 @@ int BC_type_init = 0;
 string HOST_IP_init = "192.168.21.200";
 int PORT_init = 1070;
    
-UDP_BC UDP_BC_test(BC_type_init,HOST_IP_init,PORT_init);
+//UDP_BC UDP_BC_test(BC_type_init,HOST_IP_init,PORT_init);
+UDP_BC * UDP_BC_test;
 
 /*ofstream vel_out("/home/czx/vel.txt");
 bool odom_first=true;
@@ -253,9 +265,9 @@ vector<vector<int> > adj_list;
 
 void rcv_thread()
 {
-    cout<<"0000000000"<<endl;
+    cout<<"[INFO]manager rcv thread started"<<endl;
     int BC_type_init = 0;
-    string HOST_IP_init = "192.168.21.200";
+    //string HOST_IP_init = "192.168.21.200";
     int PORT_init = 1070;
    
     UDP_BC UDP_BC_test(BC_type_init,HOST_IP_init,PORT_init);
@@ -283,6 +295,7 @@ void rcv_thread()
             continue;
         }
         string fullstring=recv_data;//rcv string
+        //cout<<fullstring<<endl;
         //cout<<"111111111111"<<endl;
         if(fullstring.length()<1 || fullstring[0]!='1')
         {
@@ -452,7 +465,7 @@ void swarmPlanCB(const decide_softbus_msgs::Path::ConstPtr& pre_plan)
   cout<<pmsg.px.size()<<' '<<pmsg.py.size()<<' '<<pmsg.pz.size()<<' '<<pmsg.ox.size()<<' '<<pmsg.oy.size()<<' '<<pmsg.oz.size()<<' '<<pmsg.ow.size()<<endl;
   string pmsg_string="2"+archiveStream.str();
   string msg_type = "0";
-  UDP_BC_test.UDP_BC_send(msg_type,pmsg_string);
+  UDP_BC_test->UDP_BC_send(msg_type,pmsg_string);
   
   istringstream ias(pmsg_string.substr(1));
   boost::archive::text_iarchive ia(ias);
@@ -479,6 +492,17 @@ int main(int argc, char** argv)
    ros::NodeHandle n;
    srand(time(0));
    bool param_ok = ros::param::get ("~robotnum", robotnum);
+   param_ok = ros::param::get ("~hostip", HOST_IP_init);
+   if(!param_ok)
+   {
+       cout<<"[ERROR]host ip param failed"<<endl;
+       exit(1);
+   }
+   else
+   {
+       cout<<"manager start with host ip"<<HOST_IP_init<<endl;
+   }
+   UDP_BC_test = new UDP_BC(BC_type_init,HOST_IP_init,PORT_init);
    for(int i=0;i<robotnum;i++)
    {
       OdomHandle *p=new OdomHandle(i);
@@ -596,7 +620,7 @@ int main(int argc, char** argv)
       //ActivatePub.publish(sendstring);
       string msg_type = "0";
       int index = 0;
-      UDP_BC_test.UDP_BC_send(msg_type,sendstring);
+      UDP_BC_test->UDP_BC_send(msg_type,sendstring);
       
       /*publish neighbor
       for(int i=0;i<robotnum;i++)
